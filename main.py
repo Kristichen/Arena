@@ -25,8 +25,24 @@ while running:
     pressed = pygame.key.get_pressed()
     screen.fill("black")
     player.update(pressed)
-    player.draw(screen)
 
+    arena=pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+    cx, cy = WIDTH // 2, HEIGHT // 2
+    pygame.draw.circle(arena, "darkgreen", (cx, cy), ARENA_RADIUS)
+    
+
+    zoom = player.get_zoom()
+    scaled_w = int(WIDTH * zoom)
+    scaled_h = int(HEIGHT * zoom)
+    scaled_arena = pygame.transform.smoothscale(arena, (scaled_w, scaled_h))
+
+    arena_x = (WIDTH - scaled_w) // 2
+    arena_y = (HEIGHT - scaled_h) // 2
+
+    screen.fill("black")
+    screen.blit(scaled_arena, (arena_x, arena_y)) 
+
+    player.draw(screen)
     # flip() the display to put your work on screen
     pygame.display.flip()
 

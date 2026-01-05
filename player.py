@@ -8,8 +8,7 @@ class Player:
         self.vx=vx
         self.vy=vy
         self.on_the_ground=True
-        self.jump=0
-        self.gravity = 1
+        self.jump_height = 0
 
     def draw(self, screen):
         pygame.draw.circle(screen, "white", (self.x, self.y), 10)
@@ -25,5 +24,18 @@ class Player:
             self.x += self.vx
 
         if pressed[pygame.K_SPACE] and self.on_the_ground:
-            self.jump=-15
             self.on_the_ground=False
+            self.jump_height=20
+
+        if not self.on_the_ground:
+            self.jump_height -= 1
+            if self.jump_height <= 0:
+                self.jump_height = 0
+                self.on_the_ground = True
+
+    def get_zoom(self):
+        """
+        Returns zoom factor based on how high the jump is.
+        0 → no zoom, 20 → small zoom-out
+        """
+        return 1 - self.jump_height * 0.005
