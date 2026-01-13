@@ -1,12 +1,13 @@
 import pygame
 import math
 import time
+from constants import *
 
 pygame.init()
 
-WIDTH, HEIGHT = 900, 900
-CENTER = (WIDTH // 2, HEIGHT // 2)
-RADIUS = 350
+#WIDTH, HEIGHT = 900, 900
+#CENTER = (WIDTH // 2, HEIGHT // 2)
+#RADIUS = 350
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Spielarena mit Countdown und Sektoren")
@@ -35,7 +36,7 @@ def sektort_von_position(pos):
     dy = pos [1] - CENTER[1]
     distance = math.sqrt(dx*dx + dy * dy)
 
-    if distance >= RADIUS:
+    if distance >= ARENA_RADIUS:
         return None
     
     winkel = (math.degrees(math.atan2(dy,dx)) + 360) % 360
@@ -66,13 +67,13 @@ while running:
 
     screen.fill((240, 230, 200))
 
-    pygame.draw.circle(screen, (120, 80, 40), CENTER, RADIUS + 5)
-    pygame.draw.circle(screen, (240, 240, 240), CENTER, RADIUS)
+    pygame.draw.circle(screen, (120, 80, 40), CENTER, ARENA_RADIUS + 5)
+    pygame.draw.circle(screen, (240, 240, 240), CENTER, ARENA_RADIUS)
 
     # Aktiven Sektor färben
     start = current_sector * 60
     ende = start + 60
-    draw_sector(screen, CENTER, RADIUS, start, ende, SECTOR_COLORS[current_sector])
+    draw_sector(screen, CENTER, ARENA_RADIUS, start, ende, SECTOR_COLORS[current_sector])
 
 
     text_countdown = font.render(f"Countdown: {time_left}s", True, (0, 0, 0))
