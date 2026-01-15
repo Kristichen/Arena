@@ -1,13 +1,13 @@
 import pygame
 class Feuerball:
     def __init__(self, x, y, vx, vy):
-        self.x = x
-        self.y = y
-        self.vy = vy
-        self.vx = vx
+        self.x = float(x)
+        self.y = float(y)
+        self.vy = float(vy)
+        self.vx = float(vx)
         self.radius = 15
         self.alive = True
-        self.color = "blue"       
+        self.color = "red"       
 
     def update(self):
         if not self.alive:
@@ -26,7 +26,7 @@ class Feuerball:
 
     def kill(self):
         self.alive = False
-        
+
 # pygame.init()
 # WIDTH = 500
 # HEIGHT = 500
