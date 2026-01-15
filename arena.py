@@ -1,18 +1,14 @@
 import pygame
 import math
 import time
+
 from constants import *
+import sektoren.S1_Sektoraktivität as sektor1
 
 pygame.init()
-
-#WIDTH, HEIGHT = 900, 900
-#CENTER = (WIDTH // 2, HEIGHT // 2)
-#RADIUS = 350
-
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Spielarena mit Countdown und Sektoren")
 clock = pygame.time.Clock()
-
 font = pygame.font.Font(None, 48)
 
 # Farben
@@ -25,11 +21,11 @@ SECTOR_COLORS = [
     (40 ,120 ,60 ),    # grün dunkel [5]
 ]
 
+COUNTDOWN_TIME = 20  
 current_sector = 0  
 sector_aktiv = [False, False, False, False, False, False]
-
-COUNTDOWN_TIME = 20  
 sector_end_time = time.time() + COUNTDOWN_TIME
+sektor1_war_aktiv = False
 
 def sektort_von_position(pos):
     dx = pos[0] - CENTER[0]
@@ -66,7 +62,6 @@ while running:
         time_left = COUNTDOWN_TIME
 
     screen.fill((240, 230, 200))
-
     pygame.draw.circle(screen, (120, 80, 40), CENTER, ARENA_RADIUS + 5)
     pygame.draw.circle(screen, (240, 240, 240), CENTER, ARENA_RADIUS)
 
@@ -75,6 +70,18 @@ while running:
     ende = start + 60
     draw_sector(screen, CENTER, ARENA_RADIUS, start, ende, SECTOR_COLORS[current_sector])
 
+    # Sektor 1
+    sektor1_aktiv = (current_sector == 0)
+    if sektor1_aktiv and not sektor1_war_aktiv:
+        sektor1.start(anzahl=20)
+
+    if not sektor1_aktiv and sektor1_war_aktiv:
+        sektor1.stop()
+
+    if sektor1_aktiv:
+        sektor1.update_and_draw(screen)
+
+    sektor1_war_aktiv = sektor1_aktiv
 
     text_countdown = font.render(f"Countdown: {time_left}s", True, (0, 0, 0))
     screen.blit(text_countdown, (WIDTH - 300, 30))

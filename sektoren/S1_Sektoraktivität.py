@@ -1,34 +1,33 @@
-from S1_Feuerbälle import Feuerball
+from sektoren.S1_Feuerbälle import*
+from constants import * 
 import random
-from constants import*
-import pygame
+#import pygame
 
-pygame.init()
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-clock = pygame.time.Clock()
-running = True
+_feuerbaelle = [] # _ -> damit interne Liste
+_is_running = False
 
-Feuerbaelle = []
-for i in range(20):
-    x = random.randint(50, WIDTH-50)
-    y = random.randint(50, HEIGHT-50)
-    vx = random.randint(2,5)
-    vy = random.randint(2,5)
-    Feuerbaelle.append(Feuerball(x, y,vx, vy))
+def start(anzahl = 20):
+    global _feuerbaelle, _is_running
+    _is_running = True
+    _feuerbaelle = []
 
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+    for _ in range(anzahl):
+        x = random.randint(50, WIDTH-50)
+        y = random.randint(50, HEIGHT-50)
+        vx = random.randint(2,5)
+        vy = random.randint(2,5)
+        _feuerbaelle.append(Feuerball(x, y,vx, vy))
 
-    screen.fill("white")
+def stop():
+    global _feuerbaelle, _is_running
+    _is_running = False
+    _feuerbaelle = []
 
-    for b in Feuerbaelle:
+def update_and_draw(screen):
+    if not _is_running:
+        return
+    
+    for b in _feuerbaelle:
         b.update()
         b.draw(screen)
-
-    pygame.display.flip()
-    clock.tick(60)  # limits FPS to 60
-
-pygame.quit()
 

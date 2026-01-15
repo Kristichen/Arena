@@ -7,22 +7,26 @@ class Feuerball:
         self.vx = vx
         self.radius = 15
         self.alive = True
-        self.color = "blue"
+        self.color = "blue"       
+
+    def update(self):
+        if not self.alive:
+            return 
+        
+        self.x += self.vx
+        self.y += self.vy
+
+        #Könnte hier noch abpraller einbauen, also das feuerball nicht einfach aus dem kreis herausfliegt
 
     def draw(self, screen):
-        pygame.draw.circle(screen, self.color, (self.x, self.y), self.radius)
+        if not self.alive:
+            return
+        
+        pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
 
     def kill(self):
         self.alive = False
         
-
-    def update(self):
-        self.x += self.vx
-        self.y += self.vy
-
-    def draw(self, screen):
-        pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
- 
 # pygame.init()
 # WIDTH = 500
 # HEIGHT = 500
