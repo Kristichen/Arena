@@ -2,10 +2,10 @@ import pygame
 
 class Feuerball:
     def __init__(self, x, y, vx, vy):
-        self.x = x
-        self.y = y
-        self.vy = vy
-        self.vx = vx
+        self.x = float(x)
+        self.y = float(y)
+        self.vx = float(vx)
+        self.vy = float(vy)
         self.radius = 15
         self.alive = True
         self.color = "red"       

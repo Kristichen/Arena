@@ -14,8 +14,8 @@ def start(anzahl = 20):
     for _ in range(anzahl):
         x = random.randint(50, WIDTH-50)
         y = random.randint(50, HEIGHT-50)
-        vx = random.randint(0.5,2)
-        vy = random.randint(0.5,2)
+        vx = random.uniform(0.5,2)
+        vy = random.uniform(0.5,2)
         _feuerbaelle.append(Feuerball(x, y,vx, vy))
 
 def stop():
