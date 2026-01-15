@@ -2,10 +2,10 @@ import pygame
 
 class Feuerball:
     def __init__(self, x, y, vx, vy):
-        self.x = float(x)
-        self.y = float(y)
-        self.vy = float(vy)
-        self.vx = float(vx)
+        self.x = x
+        self.y = y
+        self.vy = vy
+        self.vx = vx
         self.radius = 15
         self.alive = True
         self.color = "red"       
@@ -23,7 +23,7 @@ class Feuerball:
         if not self.alive:
             return
         
-        pygame.draw.circle(screen, self.color, (float(self.x), float(self.y)), self.radius)
+        pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
 
     def kill(self):
         self.alive = False
