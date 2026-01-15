@@ -23,7 +23,7 @@ class Feuerball:
         if not self.alive:
             return
         
-        pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
+        pygame.draw.circle(screen, self.color, (float(self.x), float(self.y)), self.radius)
 
     def kill(self):
         self.alive = False
