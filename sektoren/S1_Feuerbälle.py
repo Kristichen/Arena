@@ -1,4 +1,5 @@
 import pygame
+
 class Feuerball:
     def __init__(self, x, y, vx, vy):
         self.x = float(x)
