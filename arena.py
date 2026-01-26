@@ -6,6 +6,8 @@ from constants import *
 from player import Player
 import sektoren.S1_Sektoraktivität as sektor1
 import sektoren.S1_Sektordeaktivieren as erloesen
+import sektoren.S1_continue as s1_continue
+
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -29,8 +31,11 @@ aktiver_sektor = 0
 sector_end_time = time.time() + COUNTDOWN_TIME
 sektor1_war_aktiv = False
 player = Player(WIDTH//2, HEIGHT//2 + 120, vx=4, vy=4)
+#sektor1_erloest = False 
 
-
+#if aktiver_sektor == 0:
+#    if erloesen.check_and_deactivate(player, sektor1):
+#        sektor1_erloest = True
 
 def sektort_von_position(pos):
     dx = pos[0] - CENTER[0]
@@ -83,6 +88,9 @@ def update_sector(welcher_sektor):
     if sektor1_aktiv:
         sektor1.update_and_draw(screen)
 
+    #if sektor1.is_bleibende():
+    #    sektor1.update_and_draw(screen)
+
     sektor1_war_aktiv = sektor1_aktiv
 
 running = True
@@ -96,6 +104,12 @@ while running:
     time_left = int(sector_end_time - now)
 
     if time_left <= 0:
+        #if aktiver_sektor == 0 and not sektor1_erloest:
+        #    s1_continue.apply(sektor1)
+        
+        if aktiver_sektor == 0:
+            sektor1_erloest = False 
+
         aktiver_sektor = (aktiver_sektor + 1) % 6
         sector_end_time = now + COUNTDOWN_TIME
         time_left = COUNTDOWN_TIME
