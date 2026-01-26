@@ -13,7 +13,7 @@ font = pygame.font.Font(None, 48)
 
 # Farben
 SECTOR_COLORS = [
-    (120 ,220 ,200 ),      # türkis hell [0]
+    (230, 220, 190 ),      # türkis hell [0]
     ( 40,130 ,120 ),    # türkis dunkel [1]
     (80 ,110 ,170 ),      # marine hell [2]
     (20 ,40 ,90 ),    # marine dunkel [3]
@@ -102,8 +102,10 @@ while running:
 
     start = SEKTOR_START_WINKEL - aktiver_sektor * 60
     ende = start-60
-    update_sector(aktiver_sektor)
 
+    draw_sector(screen, CENTER, ARENA_RADIUS, start, ende, SECTOR_COLORS[aktiver_sektor])
+    update_sector(aktiver_sektor)
+    
     text_countdown = font.render(f"Countdown: {time_left}s", True, (0, 0, 0))
     screen.blit(text_countdown, (WIDTH - 300, 30))
 

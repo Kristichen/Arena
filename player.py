@@ -12,7 +12,7 @@ class Player:
         self.jump_height = 0
 
     def draw(self, screen):
-        pygame.draw.circle(screen, "white", (self.x, self.y), RLAYER_RADIUS)
+        pygame.draw.circle(screen, "white", (self.x, self.y), PLAYER_RADIUS)
 
     def update(self, pressed):
         new_x=self.x
@@ -29,7 +29,7 @@ class Player:
 
         dx=new_x-WIDTH/2
         dy=new_y-HEIGHT/2
-        radii=RADIUS-RLAYER_RADIUS
+        radii=RADIUS-PLAYER_RADIUS
         if sqrt(dx**2 +dy**2)<radii:
             self.x= new_x
             self.y= new_y
