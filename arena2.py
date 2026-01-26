@@ -74,9 +74,6 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
-            sector_running = False
-
     time_left = int(sector_end_time - now)
     if time_left <= 0:
         active_sector = (active_sector + 1) % 6
