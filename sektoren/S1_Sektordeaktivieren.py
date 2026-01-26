@@ -11,13 +11,11 @@ ERLOESEN_BORDER = (120, 20, 20)     # dunkler Rand
 
 
 def draw(screen):
-    """Zeichnet den roten Erlösen-Kreis."""
     pygame.draw.circle(screen, ERLOESEN_COLOR, ERLOESEN_POS, ERLOESEN_RADIUS)
     pygame.draw.circle(screen, ERLOESEN_BORDER, ERLOESEN_POS, ERLOESEN_RADIUS, 3)
 
 
 def touched(player) -> bool:
-    """True, wenn Player den Erlösen-Kreis berührt."""
     # Player-Radius: nimm deine Konstante
     pr = PLAYER_RADIUS  # falls deine Konstante anders heisst: anpassen!
 
@@ -29,10 +27,6 @@ def touched(player) -> bool:
 
 
 def check_and_deactivate(player, sektor1_module) -> bool:
-    """
-    Wenn berührt -> sektor1.stop() (Feuerbälle weg).
-    Gibt True zurück, wenn deaktiviert wurde.
-    """
     if touched(player):
         sektor1_module.stop()
         return True

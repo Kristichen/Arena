@@ -3,7 +3,9 @@ import math
 import time
 
 from constants import *
+from player import Player
 import sektoren.S1_Sektoraktivität as sektor1
+import sektoren.S1_Sektordeaktivieren as erloesen
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -26,6 +28,8 @@ SEKTOR_START_WINKEL = 270
 aktiver_sektor = 0  
 sector_end_time = time.time() + COUNTDOWN_TIME
 sektor1_war_aktiv = False
+player = Player(WIDTH//2, HEIGHT//2 + 120, vx=4, vy=4)
+
 
 
 def sektort_von_position(pos):
@@ -96,6 +100,9 @@ while running:
         sector_end_time = now + COUNTDOWN_TIME
         time_left = COUNTDOWN_TIME
 
+    pressed = pygame.key.get_pressed()
+    player.update(pressed)
+
     screen.fill((240, 230, 200))
     pygame.draw.circle(screen, (120, 80, 40), CENTER, ARENA_RADIUS + 5)
     pygame.draw.circle(screen, (240, 240, 240), CENTER, ARENA_RADIUS)
@@ -104,8 +111,14 @@ while running:
     ende = start-60
 
     draw_sector(screen, CENTER, ARENA_RADIUS, start, ende, SECTOR_COLORS[aktiver_sektor])
+    erloesen.draw(screen)
     update_sector(aktiver_sektor)
-    
+
+    if aktiver_sektor == 0:
+        erloesen.check_and_deactivate(player, sektor1)
+
+    player.draw(screen)
+
     text_countdown = font.render(f"Countdown: {time_left}s", True, (0, 0, 0))
     screen.blit(text_countdown, (WIDTH - 300, 30))
 
