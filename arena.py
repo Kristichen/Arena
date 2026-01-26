@@ -117,6 +117,9 @@ while running:
     if aktiver_sektor == 0:
         erloesen.check_and_deactivate(player, sektor1)
 
+        if player.alive and sektor1.player_hit(player):
+            player.alive = False
+            sektor1.stop()
     player.draw(screen)
 
     text_countdown = font.render(f"Countdown: {time_left}s", True, (0, 0, 0))
