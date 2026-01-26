@@ -2,6 +2,7 @@ import pygame
 import math
 import time
 from constants import *
+from laser import Laser
 
 import random
 
@@ -13,6 +14,7 @@ RADIUS = 350
 pygame.init()
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+arena=pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
 pygame.display.set_caption("Fate of Nature: Survive the Arena")
 clock = pygame.time.Clock()
 
@@ -58,6 +60,7 @@ def draw_sector(screen, mitte, radius, winkel_start, winkel_ende, color):
 
 running = True
 player=Player(WIDTH/2,HEIGHT/2,4,4)
+laser=Laser(start_sector=1)
 
 while running:
     for event in pygame.event.get():
@@ -74,8 +77,7 @@ while running:
 
     pressed = pygame.key.get_pressed()
     player.update(pressed)
-
-    arena=pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+    laser.update()
 
     pygame.draw.circle(arena, (120, 80, 40), CENTER, RADIUS + 5)
     pygame.draw.circle(arena, (240, 240, 240), CENTER, RADIUS)
@@ -85,6 +87,7 @@ while running:
     ende = start + 60
     draw_sector(arena, CENTER, RADIUS, start, ende, SECTOR_COLORS[current_sector])
 
+    laser.draw(arena)
 
     text_countdown = font.render(f"Countdown: {time_left}s", True, (0, 0, 0))
     screen.blit(text_countdown, (WIDTH - 300, 30))
@@ -104,6 +107,7 @@ while running:
     screen.blit(scaled_arena, (arena_x, arena_y)) 
 
     player.draw(screen)
+    
 
 
 
