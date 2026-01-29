@@ -4,9 +4,9 @@ import time
 
 from constants import *
 from player import Player
-import sektoren.S1_Sektoraktivität as feuer
-import sektoren.S1_Sektordeaktivieren as erloesen
-import sektor_2.S2_Sektoraktivität as rauch
+import sektor0.S1_Sektoraktivität as feuer
+import sektor0.S1_Sektordeaktivieren as erloesen
+import sektor2.S2_Sektoraktivität as rauch
 
 print("Rauch-Modul:", rauch.__file__)
 print("Hat init_images?", hasattr(rauch, "init_images"))

@@ -2,9 +2,9 @@ import pygame
 import math
 
 from constants import PLAYER_RADIUS
-from sektor_2.S2_Gas import RauchWolke
+from sektor2.S2_Gas import RauchWolke
 
-from sektor_2 import S2_Gas
+from sektor2 import S2_Gas
 def init_images():
     S2_Gas.init_images()
 
