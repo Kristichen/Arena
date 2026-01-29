@@ -2,18 +2,15 @@ import pygame
 import math
 from constants import *
 
-# Erlösen-Kreis (in der Mitte)
 ERLOESEN_POS = (WIDTH // 2, HEIGHT // 2)
 ERLOESEN_RADIUS = 22
 
-ERLOESEN_COLOR = (220, 50, 50)      # rot
-ERLOESEN_BORDER = (120, 20, 20)     # dunkler Rand
-
+ERLOESEN_COLOR = (255, 165, 0)
+ERLOESEN_BORDER = (200, 120, 0)    
 
 def draw(screen):
     pygame.draw.circle(screen, ERLOESEN_COLOR, ERLOESEN_POS, ERLOESEN_RADIUS)
     pygame.draw.circle(screen, ERLOESEN_BORDER, ERLOESEN_POS, ERLOESEN_RADIUS, 3)
-
 
 def touched(player) -> bool:
     pr = PLAYER_RADIUS  

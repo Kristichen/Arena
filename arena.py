@@ -4,16 +4,19 @@ import time
 
 from constants import *
 from player import Player
-import sektoren.S1_Sektoraktivität as sektor1
+import sektoren.S1_Sektoraktivität as feuer
 import sektoren.S1_Sektordeaktivieren as erloesen
-import sektoren.S1_continue as s1_continue
+import sektor_2.S2_Sektoraktivität as rauch
 
+print("Rauch-Modul:", rauch.__file__)
+print("Hat init_images?", hasattr(rauch, "init_images"))
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Spielarena mit Countdown und Sektoren")
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 48)
+rauch.init_images()
 
 # Farben
 SECTOR_COLORS = [
@@ -29,9 +32,11 @@ COUNTDOWN_TIME = 20
 SEKTOR_START_WINKEL = 270
 aktiver_sektor = 0  
 sector_end_time = time.time() + COUNTDOWN_TIME
-sektor1_war_aktiv = False
+feuer_war_aktiv = False
+laser_war_aktiv = False
+rauch_war_aktiv = False
 player = Player(WIDTH//2, HEIGHT//2 + 120, vx=4, vy=4)
-#sektor1_erloest = False 
+sektor1_erloest = False 
 
 #if aktiver_sektor == 0:
 #    if erloesen.check_and_deactivate(player, sektor1):
@@ -75,23 +80,36 @@ def draw_sector(screen, mitte, radius, winkel_start, winkel_ende, color):
     pygame.draw.polygon(screen, color, points)
     
 def update_sector(welcher_sektor):
-    global sektor1_war_aktiv
+    global feuer_war_aktiv, laser_war_aktiv, rauch_war_aktiv
 
-    sektor1_aktiv = (welcher_sektor == 0)
+    feuer_aktiv = (welcher_sektor == 0)
+    laser_aktiv = (welcher_sektor == 1)
+    rauch_aktiv = (welcher_sektor == 2)
 
-    if sektor1_aktiv and not sektor1_war_aktiv:
-        sektor1.start(anzahl=20)
+# FEUER
+    if feuer_aktiv and not feuer_war_aktiv:
+        feuer.start(anzahl=20)
+    if not feuer_aktiv and feuer_war_aktiv:
+        feuer.stop()
+    if feuer_aktiv:
+        feuer.update_and_draw(screen)
 
-    if not sektor1_aktiv and sektor1_war_aktiv:
-        sektor1.stop()
 
-    if sektor1_aktiv:
-        sektor1.update_and_draw(screen)
+# RAUCH
 
-    #if sektor1.is_bleibende():
-    #    sektor1.update_and_draw(screen)
+    if rauch_aktiv and not rauch_war_aktiv:
+        rauch.start()
+    if not rauch_aktiv and rauch_war_aktiv:
+        rauch.stop()
+    if rauch_aktiv:
+        rauch.update_and_draw(screen)
 
-    sektor1_war_aktiv = sektor1_aktiv
+    feuer_war_aktiv = feuer_aktiv
+    laser_war_aktiv = laser_aktiv
+    rauch_war_aktiv = rauch_aktiv
+
+    
+
 
 running = True
 while running:
@@ -103,10 +121,7 @@ while running:
 
     time_left = int(sector_end_time - now)
 
-    if time_left <= 0:
-        #if aktiver_sektor == 0 and not sektor1_erloest:
-        #    s1_continue.apply(sektor1)
-        
+    if time_left <= 0:        
         if aktiver_sektor == 0:
             sektor1_erloest = False 
 
@@ -129,11 +144,17 @@ while running:
     update_sector(aktiver_sektor)
 
     if aktiver_sektor == 0:
-        erloesen.check_and_deactivate(player, sektor1)
+        erloesen.check_and_deactivate(player, feuer)
 
-        if player.alive and sektor1.player_hit(player):
+        if player.alive and feuer.player_hit(player):
             player.alive = False
-            sektor1.stop()
+            feuer.stop()
+
+    if aktiver_sektor == 2:
+        if player.alive and rauch.player_hit(player):
+            player.alive = False
+            rauch.stop()
+
     player.draw(screen)
 
     text_countdown = font.render(f"Countdown: {time_left}s", True, (0, 0, 0))
