@@ -4,6 +4,7 @@ import time
 
 from constants import *
 from player import Player
+from laser import Laser
 import sektor0.S1_Sektoraktivität as feuer
 import sektor0.S1_Sektordeaktivieren as erloesen
 import sektor2.S2_Sektoraktivität as rauch
@@ -17,11 +18,13 @@ import sektor5.S5_Sektoraktivität as wasser
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+arena=pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
 pygame.display.set_caption("Spielarena mit Countdown und Sektoren")
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 48)
 rauch.init_images()
 wasser.init_images()
+laser=Laser(start_sector=1)
 
 # Farben
 SECTOR_COLORS = [
@@ -101,14 +104,22 @@ def update_sector(welcher_sektor):
     if not feuer_aktiv and feuer_war_aktiv:
         feuer.stop()
     if feuer_aktiv:
-        feuer.update_and_draw(screen)
+        feuer.update_and_draw(arena)
+#LASER
+    if laser_aktiv and not laser_war_aktiv:
+        laser.start()
+    if not laser_aktiv and laser_war_aktiv:
+        laser.stop()
+    if laser_aktiv:
+        laser.update()
+        laser.draw(arena)
 # RAUCH
     if rauch_aktiv and not rauch_war_aktiv:
         rauch.start()
     if not rauch_aktiv and rauch_war_aktiv:
         rauch.stop()
     if rauch_aktiv:
-        rauch.update_and_draw(screen)
+        rauch.update_and_draw(arena)
 
 # WASSER
     if wasser_aktiv and not wasser_war_aktiv:
@@ -131,7 +142,6 @@ while running:
             running = False
 
     now = time.time()
-
     time_left = int(sector_end_time - now)
 
     if time_left <= 0:        
@@ -146,14 +156,14 @@ while running:
     player.update(pressed)
 
     screen.fill((240, 230, 200))
-    pygame.draw.circle(screen, (120, 80, 40), CENTER, ARENA_RADIUS + 5)
-    pygame.draw.circle(screen, (240, 240, 240), CENTER, ARENA_RADIUS)
+    pygame.draw.circle(arena, (120, 80, 40), CENTER, ARENA_RADIUS + 5)
+    pygame.draw.circle(arena, (240, 240, 240), CENTER, ARENA_RADIUS)
 
     start = SEKTOR_START_WINKEL - aktiver_sektor * 60
     ende = start-60
 
-    draw_sector(screen, CENTER, ARENA_RADIUS, start, ende, SECTOR_COLORS[aktiver_sektor])
-    erloesen.draw(screen)
+    draw_sector(arena, CENTER, ARENA_RADIUS, start, ende, SECTOR_COLORS[aktiver_sektor])
+    erloesen.draw(arena)
     update_sector(aktiver_sektor)
 
     if aktiver_sektor == 0:
@@ -173,13 +183,32 @@ while running:
             player.alive = False
             wasser.stop()
 
-    player.draw(screen)
+    if laser.is_on and not laser.turned_off:
+        if laser.player_hit(player) and player.on_ground:
+            player.alive = False
+            laser.stop()
+
+        if laser.jumped_over(player) and laser.player_hit(player):
+            laser.stop()
+    laser.draw(arena)
+
+
 
     text_countdown = font.render(f"Countdown: {time_left}s", True, (0, 0, 0))
     screen.blit(text_countdown, (WIDTH - 300, 30))
-
     text_sector = font.render(f"Aktiver Sektor: {aktiver_sektor + 1}", True, (0, 0, 0))
     screen.blit(text_sector, (WIDTH - 320, 80))
+
+    zoom = player.get_zoom()
+    scaled_w = int(WIDTH * zoom)
+    scaled_h = int(HEIGHT * zoom)
+    scaled_arena = pygame.transform.smoothscale(arena, (scaled_w, scaled_h))
+
+    arena_x = (WIDTH - scaled_w) // 2
+    arena_y = (HEIGHT - scaled_h) // 2
+    screen.blit(scaled_arena, (arena_x, arena_y)) 
+    player.draw(screen)
+
 
     pygame.display.flip()
     clock.tick(60)
