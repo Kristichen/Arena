@@ -1,28 +1,47 @@
 import pygame
-import math
 from constants import *
+import os
 
 # Erlösen-Kreis (in der Mitte)
-ERLOESEN_POS = (WIDTH // 2, HEIGHT // 2)
-ERLOESEN_RADIUS = 22
+ERLOESEN_POS = (WIDTH // 3, HEIGHT // 3)
 
-ERLOESEN_COLOR = (220, 50, 50)      # rot
-ERLOESEN_BORDER = (120, 20, 20)     # dunkler Rand
+feuerloescher_img = None
+feuerloescher_rect = None
 
+ICON_SIZE = (60, 60)
+
+def init_images():
+    global feuerloescher_img, feuerloescher_rect
+
+    base = os.path.dirname(__file__)
+    path = os.path.join(base, "feuerloescher.png")
+
+    img = pygame.image.load(path).convert_alpha()
+
+    if ICON_SIZE is not None:
+        img = pygame.transform.smoothscale(img, ICON_SIZE)
+
+    feuerloescher_img = img
+    feuerloescher_rect = feuerloescher_img.get_rect(center=ERLOESEN_POS)
 
 def draw(screen):
-    pygame.draw.circle(screen, ERLOESEN_COLOR, ERLOESEN_POS, ERLOESEN_RADIUS)
-    pygame.draw.circle(screen, ERLOESEN_BORDER, ERLOESEN_POS, ERLOESEN_RADIUS, 3)
-
+    if feuerloescher_img is None or feuerloescher_rect is None:
+        return
+    screen.blit(feuerloescher_img, feuerloescher_rect)
 
 def touched(player) -> bool:
-    pr = PLAYER_RADIUS  
+    if feuerloescher_rect is None:
+        return False
 
-    dx = float(player.x) - ERLOESEN_POS[0]
-    dy = float(player.y) - ERLOESEN_POS[1]
-    dist = math.hypot(dx, dy)
+    pr = PLAYER_RADIUS
 
-    return dist <= (ERLOESEN_RADIUS + pr)
+    px, py = float(player.x), float(player.y)
+    closest_x = max(feuerloescher_rect.left, min(px, feuerloescher_rect.right))
+    closest_y = max(feuerloescher_rect.top,  min(py, feuerloescher_rect.bottom))
+
+    dx = px - closest_x
+    dy = py - closest_y
+    return (dx*dx + dy*dy) <= (pr * pr)
 
 
 def check_and_deactivate(player, feuer_module) -> bool:
