@@ -1,4 +1,4 @@
-from sektoren.S1_Feuerbälle import*
+from sektor0.S1_Feuerbälle import*
 from constants import * 
 import random
 from constants import PLAYER_RADIUS
