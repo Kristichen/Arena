@@ -114,9 +114,9 @@ def update_sector(welcher_sektor):
     if wasser_aktiv and not wasser_war_aktiv:
         wasser.start()
     if not wasser_aktiv and wasser_war_aktiv:
-        rauch.stop()
+        wasser.stop()
     if wasser_aktiv:
-        rauch.update_and_draw(screen)
+        wasser.update_and_draw(screen)
 
 
     feuer_war_aktiv = feuer_aktiv
