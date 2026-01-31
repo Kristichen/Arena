@@ -8,7 +8,7 @@ ERLOESEN_POS = (WIDTH // 3, HEIGHT // 3)
 feuerloescher_img = None
 feuerloescher_rect = None
 
-ICON_SIZE = (35, 35)
+ICON_SIZE = (60, 60)
 
 def init_images():
     global feuerloescher_img, feuerloescher_rect
