@@ -5,7 +5,7 @@ import time
 from constants import *
 from player import Player
 import sektor0.S1_Sektoraktivität as feuer
-import sektor0.S1_Sektordeaktivieren as erloesen
+import sektor0.S1_Sektordeaktivieren as feuerlöscher
 import sektor2.S2_Sektoraktivität as rauch
 import sektor5.S5_Sektoraktivität as wasser 
 
@@ -22,6 +22,7 @@ clock = pygame.time.Clock()
 font = pygame.font.Font(None, 48)
 rauch.init_images()
 wasser.init_images()
+feuerlöscher.init_images()
 
 # Farben
 SECTOR_COLORS = [
@@ -153,11 +154,11 @@ while running:
     ende = start-60
 
     draw_sector(screen, CENTER, ARENA_RADIUS, start, ende, SECTOR_COLORS[aktiver_sektor])
-    erloesen.draw(screen)
+    feuerlöscher.draw(screen)
     update_sector(aktiver_sektor)
 
     if aktiver_sektor == 0:
-        erloesen.check_and_deactivate(player, feuer)
+        feuerlöscher.check_and_deactivate(player, feuer)
 
         if player.alive and feuer.player_hit(player):
             player.alive = False
