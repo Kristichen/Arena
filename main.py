@@ -3,10 +3,12 @@ import math
 import time
 
 from constants import *
-from laser import Laser
 from player import Player
-import sektoren.S1_Sektoraktivität as sektor1
-import sektoren.S1_Sektordeaktivieren as erloesen
+from laser import Laser
+import sektor0.S1_Sektoraktivität as feuer
+import sektor0.S1_Sektordeaktivieren as erloesen
+import sektor2.S2_Sektoraktivität as rauch
+import sektor5.S5_Sektoraktivität as wasser 
 
 pygame.init()
 
@@ -15,6 +17,8 @@ arena=pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
 pygame.display.set_caption("Fate of Nature: Survive the Arena")
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 48)
+rauch.init_images()
+wasser.init_images()
 
 # Farben
 SECTOR_COLORS = [
@@ -30,11 +34,16 @@ COUNTDOWN_TIME = 20
 SEKTOR_START_WINKEL = 270
 aktiver_sektor = 0  
 sector_end_time = time.time() + COUNTDOWN_TIME
-sektor1_war_aktiv = False
-sektor2_war_aktiv = False
-letzter_sektor = aktiver_sektor
 
+#sektor1_war_aktiv = False
+#sektor2_war_aktiv = False
 
+feuer_war_aktiv = False
+laser_war_aktiv = False
+rauch_war_aktiv = False
+wasser_war_aktiv = False
+
+sektor1_erloest = False 
 def sektort_von_position(pos):
     dx = pos[0] - CENTER[0]
     dy = pos [1] - CENTER[1]
@@ -73,40 +82,53 @@ def draw_sector(screen, mitte, radius, winkel_start, winkel_ende, color):
     pygame.draw.polygon(screen, color, points)
     
 def update_sector(welcher_sektor):
-    global sektor1_war_aktiv
+    global feuer_war_aktiv, laser_war_aktiv, rauch_war_aktiv, wasser_war_aktiv
 
-    sektor1_aktiv = (welcher_sektor == 0)
-
-    if sektor1_aktiv and not sektor1_war_aktiv:
-        #sektor1.stop()  
-        sektor1.start(anzahl=20)
-
-    if not sektor1_aktiv and sektor1_war_aktiv:
-        sektor1.stop()
-
-    if sektor1_aktiv:
-        sektor1.update_and_draw(arena)
-
-
-    #if sektor1.is_bleibende():
-    #    sektor1.update_and_draw(screen)
-
-    sektor1_war_aktiv = sektor1_aktiv
-
-
-
-def update_laser(welcher_sektor):
-    global sektor2_war_aktiv
-
+    feuer_aktiv = (welcher_sektor == 0)
     laser_aktiv = (welcher_sektor == 1)
+    rauch_aktiv = (welcher_sektor == 2)
+    wasser_aktiv = (welcher_sektor == 5)
 
-    if laser_aktiv and not sektor2_war_aktiv:
+# FEUER
+    if feuer_aktiv and not feuer_war_aktiv:
+        feuer.start(anzahl=20)
+    if not feuer_aktiv and feuer_war_aktiv:
+        feuer.stop()
+    if feuer_aktiv:
+        feuer.update_and_draw(arena)
+#LASER
+    if laser_aktiv and not laser_war_aktiv:
         laser.start()
-
-    if not laser_aktiv and sektor2_war_aktiv:
+    if not laser_aktiv and laser_war_aktiv:
         laser.stop()
+    if laser_aktiv:
+        laser.draw(arena)
+        laser.update()
+# RAUCH
+    if rauch_aktiv and not rauch_war_aktiv:
+        rauch.start()
+    if not rauch_aktiv and rauch_war_aktiv:
+        rauch.stop()
+    if rauch_aktiv:
+        rauch.update_and_draw(arena)
 
-    sektor2_war_aktiv = laser_aktiv
+# WASSER
+    if wasser_aktiv and not wasser_war_aktiv:
+        wasser.start()
+    if not wasser_aktiv and wasser_war_aktiv:
+        wasser.stop()
+    if wasser_aktiv:
+        wasser.update_and_draw(arena)
+
+
+    feuer_war_aktiv = feuer_aktiv
+    laser_war_aktiv = laser_aktiv
+    rauch_war_aktiv = rauch_aktiv
+    wasser_war_aktiv = wasser_aktiv
+
+
+#delete etl later
+
 
 
 
@@ -123,8 +145,6 @@ while running:
     time_left = int(sector_end_time - now)
 
     if time_left <= 0:
-        letzter_sektor = aktiver_sektor
-
         if aktiver_sektor == 0:
             sektor1_erloest = False 
 
@@ -134,7 +154,7 @@ while running:
 
     pressed = pygame.key.get_pressed()
     player.update(pressed)
-    update_laser(aktiver_sektor)
+    #update_laser(aktiver_sektor) add that
     laser.update()
 
     screen.fill((240, 230, 200))
@@ -146,17 +166,26 @@ while running:
     start = SEKTOR_START_WINKEL - aktiver_sektor * 60
     ende = start-60
 
-    draw_sector(arena, CENTER, RADIUS, start, ende, SECTOR_COLORS[aktiver_sektor])
+    draw_sector(arena, CENTER, ARENA_RADIUS, start, ende, SECTOR_COLORS[aktiver_sektor])
     erloesen.draw(arena)
     update_sector(aktiver_sektor)
 
     if aktiver_sektor == 0:
-        erloesen.check_and_deactivate(player, sektor1)
+        erloesen.check_and_deactivate(player, feuer)
 
-        if player.alive and sektor1.player_hit(player):
+        if player.alive and feuer.player_hit(player):
             player.alive = False
-            sektor1.stop()
+            feuer.stop()
 
+    if aktiver_sektor == 2:
+        if player.alive and rauch.player_hit(player):
+            player.alive = False
+            rauch.stop()
+
+    if aktiver_sektor == 5:
+        if player.alive and wasser.player_hit(player):
+            player.alive = False
+            wasser.stop()
     if laser.is_on and not laser.turned_off:
         if laser.player_hit(player) and player.on_ground:
             player.alive = False
@@ -164,7 +193,7 @@ while running:
 
         if laser.jumped_over(player) and laser.player_hit(player):
             laser.stop()
-    laser.draw(arena)
+
 
     text_countdown = font.render(f"Countdown: {time_left}s", True, (0, 0, 0))
     screen.blit(text_countdown, (WIDTH - 300, 30))
