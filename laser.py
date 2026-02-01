@@ -1,11 +1,8 @@
-from turtle import distance
 import pygame
-
 from constants import *
 import math
-
 class Laser:
-    def __init__(self,start_sector, speed=0.1):
+    def __init__(self,start_sector, speed=0.5):
         self.angle= start_sector*60 +120
         self.speed=speed
         self.is_on= False
@@ -33,22 +30,24 @@ class Laser:
         pygame.draw.line(arena, "red", CENTER, (x_end, y_end),2)
 
     def player_hit(self, player) -> bool:
-        if not self.is_on or self.turned_off:
-            return False
+        if not self.is_on:
+          return False
 
         rad = math.radians(self.angle)
-        x1, y1 = CENTER
-        x2 = CENTER[0] + math.cos(rad) * RADIUS
-        y2 = CENTER[1] + math.sin(rad) * RADIUS
-        px, py = player.x, player.y
+        dx = math.cos(rad)
+        dy = math.sin(rad)
+        px = player.x - CENTER[0]
+        py = player.y - CENTER[1]
+        proj = px * dx + py * dy
+        if proj <= 0:
+            return False
+        dist = abs(px * dy - py * dx)
 
-        num = abs((y2 - y1)*px - (x2 - x1)*py + x2*y1 - y2*x1)
-        den = math.hypot(y2 - y1, x2 - x1)
+        return dist <= PLAYER_RADIUS
 
-        distance = num / den if den != 0 else 999
-        return distance < PLAYER_RADIUS
+
     
     def jumped_over(self, player):
         if not self.is_on or self.turned_off:
             return False
-        return not player.on_ground and player.jump_height > 10
+        return not player.on_ground

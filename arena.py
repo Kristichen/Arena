@@ -5,6 +5,7 @@ import time
 from constants import *
 from player import Player
 from laser import Laser
+from bomb import Bomb
 import sektor0.S1_Sektoraktivität as feuer
 import sektor0.S1_Sektordeaktivieren as feuerloescher
 import sektor2.S2_Sektordeaktivieren as gasmaske
@@ -32,6 +33,13 @@ SECTOR_COLORS = [
     (120, 200,120 ),    # grün hell [4]
     (40 ,120 ,60 ),    # grün dunkel [5]
 ]
+GAME_START=-1
+GAME_RUNNING = 0
+GAME_OVER   = 1
+GAME_WIN    = 2
+
+sektor_comlited=0
+game_state = GAME_START
 
 COUNTDOWN_TIME = 20  
 SEKTOR_START_WINKEL = 270
@@ -135,15 +143,33 @@ def update_sector(welcher_sektor):
     rauch_war_aktiv = rauch_aktiv
     wasser_war_aktiv = wasser_aktiv
 
+bombs=[]
+last_bomb= pygame.time.get_ticks()
+interval=500
+bomb_active=False
+
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
+        elif event.type == pygame.KEYDOWN:
+            if game_state == GAME_START:
+                game_state = GAME_RUNNING
+                start_time = time.time()
+            elif event.key == pygame.K_ESCAPE and game_state != GAME_RUNNING:
+                running = False
+    if game_state == GAME_START:
+        screen.fill((0, 0, 0))
+        text_start = font .render ("Press any key to start", True, (255, 255, 255))
+        screen.blit (text_start, (WIDTH // 2 - text_start.get_width() // 2, HEIGHT // 2 - text_start.get_height() // 2))
+        pygame.display.flip()
+        continue
     now = time.time()
     time_left = int(sector_end_time - now)
 
+    if time_left <= 0 and game_state == GAME_RUNNING:   
+        aktiver_sektor = (aktiver_sektor + 1) % 6   
     if time_left <= 0:        
         if aktiver_sektor == 0:
             feuerloescher.aktiv_machen(False)
@@ -153,7 +179,13 @@ while running:
 
         aktiver_sektor = (aktiver_sektor + 1) % 6
         sector_end_time = now + COUNTDOWN_TIME
-        time_left = COUNTDOWN_TIME
+        time_left = COUNTDOWN_TIME  
+
+        if aktiver_sektor == 0:
+            sektor1_erloest = False 
+            sektor_comlited+=1
+        if sektor_comlited >=1:
+            game_state = GAME_WIN
 
     pressed = pygame.key.get_pressed()
     player.update(pressed)
@@ -187,36 +219,88 @@ while running:
     gasmaske.draw(screen)
 
 
-    if aktiver_sektor == 0:
-        feuerloescher.check_and_deactivate(player, feuer)
+    if player.alive == False:
+        game_state = GAME_OVER
+    if game_state == GAME_RUNNING:
+        if aktiver_sektor == 0:
+            feuerlöscher.check_and_deactivate(player, feuer)
 
         if player.alive and feuer.player_hit(player):
             player.alive = False
             feuer.stop()
 
-    if aktiver_sektor == 2:
-        gasmaske.check_and_deactivate(player, rauch)
+        if aktiver_sektor == 2:
+            if player.alive and rauch.player_hit(player):
+                player.alive = False
+                rauch.stop()
 
-        if player.alive and rauch.player_hit(player):
-            player.alive = False
-            rauch.stop()
+        now_ticks = pygame.time.get_ticks()
+        if aktiver_sektor == 3:
+            if not bomb_active:
+                bomb_active=True
+                last_bomb=now_ticks
+        else:
+            if bomb_active:
+                bomb_active=False
+            
 
-    if aktiver_sektor == 5:
-        if player.alive and wasser.player_hit(player):
-            player.alive = False
-            wasser.stop()
+        if aktiver_sektor == 5:
+            if player.alive and wasser.player_hit(player):
+                player.alive = False
+                wasser.stop()
 
-    if laser.is_on and not laser.turned_off:
-        if laser.player_hit(player) and player.on_ground:
-            player.alive = False
-            laser.stop()
+        if laser.is_on and not laser.turned_off:
+            if laser.player_hit(player) and player.on_ground:
+                player.alive = False
+                laser.stop()
 
         if laser.jumped_over(player) and laser.player_hit(player):
             laser.stop()
-    laser.draw(arena)
+        laser.draw(arena)
 
+        if bomb_active and aktiver_sektor==3:
+            if now_ticks - last_bomb > interval:
+                bombs.append(Bomb())
+                last_bomb = now_ticks
+        if pressed[pygame.K_w]:
+            for b in bombs[:]: 
+                if b.defuse(player):
+                    bombs.remove(b)
+        for b in bombs[:]:
+            b.update()
+            b.draw(arena)
+            if b.player_hit(player):
+                player.alive = False
+            if b.exploded:
+                if now_ticks >= b.expl_end:
+                    bombs.remove(b)
+
+    
+    text_countdown = font.render(f"Countdown: {time_left}s", True, (0, 0, 0))
+    screen.blit(text_countdown, (WIDTH - 300, 30))
+    text_sector = font.render(f"Aktiver Sektor: {aktiver_sektor + 1}", True, (0, 0, 0))
+    screen.blit(text_sector, (WIDTH - 320, 80))
+
+    zoom = player.get_zoom()
+    scaled_w = int(WIDTH * zoom)
+    scaled_h = int(HEIGHT * zoom)
+    scaled_arena = pygame.transform.smoothscale(arena, (scaled_w, scaled_h))
+
+    arena_x = (WIDTH - scaled_w) // 2
+    arena_y = (HEIGHT - scaled_h) // 2
+    screen.blit(scaled_arena, (arena_x, arena_y)) 
     player.draw(screen)
+    if game_state != GAME_RUNNING:
+        end_screen = pygame.Surface((WIDTH, HEIGHT))
+        end_screen.fill((0, 0, 0,180))
+        screen.blit(end_screen, (0, 0))
 
+        if game_state == GAME_OVER:
+            text_game_over = font.render("Game Over!", True, (255, 0, 0))
+            screen.blit(text_game_over, (WIDTH // 2 - text_game_over.get_width() // 2, HEIGHT // 2 - text_game_over.get_height() // 2))
+        elif game_state == GAME_WIN:
+            text_game_win = font.render("You Win!", True, (0, 255, 0))
+            screen.blit(text_game_win, (WIDTH // 2 - text_game_win.get_width() // 2, HEIGHT // 2 - text_game_win.get_height() // 2))
 
     pygame.display.flip()
     clock.tick(60)

@@ -5,6 +5,7 @@ import time
 from constants import *
 from player import Player
 from laser import Laser
+from bomb import Bomb
 import sektor0.S1_Sektoraktivität as feuer
 import sektor0.S1_Sektordeaktivieren as erloesen
 import sektor2.S2_Sektoraktivität as rauch
@@ -127,10 +128,10 @@ def update_sector(welcher_sektor):
     wasser_war_aktiv = wasser_aktiv
 
 
-#delete etl later
-
-
-
+bombs=[]
+last_bomb= pygame.time.get_ticks()
+interval=5000
+bomb_active=False
 
 running = True
 player = Player(WIDTH//2, HEIGHT//2 + 120, vx=4, vy=4)
@@ -181,6 +182,13 @@ while running:
         if player.alive and rauch.player_hit(player):
             player.alive = False
             rauch.stop()
+    if aktiver_sektor == 4:
+        if not bomb_active:
+            bomb_active=True
+    else:
+        if bomb_active:
+            bomb_active=False
+            bombs.clear()
 
     if aktiver_sektor == 5:
         if player.alive and wasser.player_hit(player):
@@ -193,6 +201,20 @@ while running:
 
         if laser.jumped_over(player) and laser.player_hit(player):
             laser.stop()
+
+        
+    now_ticks = pygame.time.get_ticks()
+    if bomb_active and aktiver_sektor==4:
+        if now_ticks - last_bomb > interval:
+            bombs.append(Bomb())
+            last_bomb = now_ticks
+    for b in bombs[:]:
+        b.update()
+        b.draw(arena)
+        if b.player_hit(player):
+            player.alive = False
+        if b.defused:
+            bombs.remove(b)
 
 
     text_countdown = font.render(f"Countdown: {time_left}s", True, (0, 0, 0))
