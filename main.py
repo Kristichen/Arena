@@ -155,10 +155,9 @@ while running:
 
     pressed = pygame.key.get_pressed()
     player.update(pressed)
-    #remove
-    if pressed [pygame.K_w]:
-        for b in bombs:
-            b.defuse(player)
+    #update_laser(aktiver_sektor) add that
+    laser.update()
+
     screen.fill((240, 230, 200))
 
     pygame.draw.circle(arena, (120, 80, 40), CENTER, RADIUS + 5)

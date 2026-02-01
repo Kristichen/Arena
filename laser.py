@@ -2,9 +2,6 @@ import pygame
 
 from constants import *
 import math
-
-import player
-
 class Laser:
     def __init__(self,start_sector, speed=0.1):
         self.angle= start_sector*60 +120
