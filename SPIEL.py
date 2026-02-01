@@ -6,6 +6,8 @@ from constants import *
 from player import Player
 from laser import Laser
 from bomb import Bomb
+from Texte import texte
+
 
 import sektor0.S1_Sektoraktivität as feuer
 import sektor2.S2_Sektoraktivität as rauch
@@ -39,12 +41,15 @@ arena_floor_img = pygame.transform.scale(arena_floor_img, (floor_size, floor_siz
 
 
 SECTOR_COLORS = [    
-    ( 40,130 ,120 ),    
-    (80 ,110 ,170 ),     
-    (20 ,40 ,90 ),    
-    (120, 200,120 ),    
-    (40 ,120 ,60 ),    
+    (255, 140, 0),    
+    (255, 140, 0),     
+    (255, 140, 0),    
+    (255, 140, 0),    
+    (255, 140, 0),    
 ]
+
+box = texte(WIDTH, font)
+SEKTOR_NAMEN = ["Feuer", "Laser", "Rauch", "Bomben", "Wasser"]
 
 GAME_START=-1
 GAME_RUNNING = 0
@@ -87,9 +92,9 @@ def draw_sector(screen, mitte, radius, winkel_start, winkel_ende, color):
     a = winkel_start
 
     while True:
-        rad = math.radians(a) # von CHATGPT ERKLàRT
-        x = mitte[0] + radius * math.cos(rad) # von CHATGPT ERKLàRT
-        y = mitte[1] + radius * math.sin(rad) # von CHATGPT ERKLàRT
+        rad = math.radians(a) 
+        x = mitte[0] + radius * math.cos(rad) 
+        y = mitte[1] + radius * math.sin(rad) 
         points.append((x, y))
         
         if a == winkel_ende:
@@ -118,11 +123,10 @@ def update_sector(welcher_sektor):
         feuerloescher.reset()
 
     if not feuer_aktiv and feuer_war_aktiv:
-        feuer.stop()
         feuerloescher.aktiv_machen(False)
 
-    if feuer_aktiv:
-        feuer.update_and_draw(arena)
+    feuer.update_and_draw(arena)
+
 #LASER
     if laser_aktiv and not laser_war_aktiv:
         laser.start()
@@ -133,6 +137,7 @@ def update_sector(welcher_sektor):
     if laser_aktiv:
         laser.update()
         laser.draw(arena)
+
 # RAUCH
     if rauch_aktiv and not rauch_war_aktiv:
         rauch.start()
@@ -167,6 +172,9 @@ last_bomb= pygame.time.get_ticks()
 interval=500
 bomb_active=False
 
+start_bg = pygame.image.load("Hintergrundbild.png").convert()
+start_bg = pygame.transform.smoothscale(start_bg, (WIDTH, HEIGHT))
+
 running = True
 sector_end_time = None
 while running:
@@ -182,9 +190,9 @@ while running:
                 running = False
 
     if game_state == GAME_START:
-        screen.fill((0, 0, 0))
+        screen.blit(start_bg, (0, 0))
         text_start = font .render ("Press any key to start", True, (255, 255, 255))
-        screen.blit (text_start, (WIDTH // 2 - text_start.get_width() // 2, HEIGHT // 2 - text_start.get_height() // 2))
+        screen.blit (text_start, (WIDTH // 2 - text_start.get_width() // 2, HEIGHT // 2 - text_start.get_height() // 2 + 50))
         pygame.display.flip()
         continue
 
@@ -212,23 +220,25 @@ while running:
     pygame.draw.circle(arena, (120, 80, 40), CENTER, ARENA_RADIUS + 5)
     draw_sector(arena, CENTER, ARENA_RADIUS+5, start, ende, SECTOR_COLORS[aktiver_sektor])
     arena.blit(arena_floor_img, arena_floor_img.get_rect(center=CENTER))
+    
     feuerloescher.draw(arena)
     gasmaske.draw(arena)
     rettungsring.draw(arena)
 
     update_sector(aktiver_sektor)
-    #draw_sector(arena, CENTER, ARENA_RADIUS, start, ende, SECTOR_COLORS[aktiver_sektor])
 
     if not player.alive:
         game_state = GAME_OVER
 
     if game_state == GAME_RUNNING:
 
+        if player.alive and feuer.player_hit(player):
+            player.alive = False
+
         if aktiver_sektor == 0:
             feuerloescher.check_and_deactivate(player, feuer)
             if player.alive and feuer.player_hit(player):
                 player.alive = False
-                feuer.stop()
 
         if aktiver_sektor == 2:
             gasmaske.check_and_deactivate(player, rauch)
@@ -289,14 +299,12 @@ while running:
 
     player.draw(screen)
 
-    text_countdown = font.render(f"Countdown: {time_left}s", True, (0, 0, 0))
-    screen.blit(text_countdown, (WIDTH - 300, 30))
-    text_sector = font.render(f"Aktiver Sektor: {aktiver_sektor + 1}", True, (0, 0, 0))
-    screen.blit(text_sector, (WIDTH - 320, 80))
+    box.zeichne(screen, time_left, aktiver_sektor, SEKTOR_NAMEN)
 
     if game_state == GAME_OVER:
         screen.fill((0, 0, 0))
         screen.blit(font.render("Game Over", True, (255, 0, 0)),(WIDTH//2 - 100, HEIGHT//2 - 24))   
+    
     elif game_state == GAME_WIN:
         screen.fill((0, 0, 0))
         screen.blit(font.render("You Win!", True, (0, 255, 0)),(WIDTH//2 - 80, HEIGHT//2 - 24)) 

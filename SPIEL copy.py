@@ -122,6 +122,7 @@ def update_sector(welcher_sektor):
     if laser_aktiv:
         laser.update()
         laser.draw(arena)
+        
 # RAUCH
     if rauch_aktiv and not rauch_war_aktiv:
         rauch.start()
