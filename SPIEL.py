@@ -38,8 +38,7 @@ floor_size = ARENA_RADIUS * 2
 arena_floor_img = pygame.transform.scale(arena_floor_img, (floor_size, floor_size))
 
 
-SECTOR_COLORS = [
-    (230, 220, 190 ),      
+SECTOR_COLORS = [    
     ( 40,130 ,120 ),    
     (80 ,110 ,170 ),     
     (20 ,40 ,90 ),    
@@ -77,7 +76,7 @@ def sektor_von_position(pos):
         return None
     
     winkel = (math.degrees(math.atan2(dy,dx)) + 360) % 360
-    return int(winkel // 60)
+    return int(winkel // 72)
 
 def draw_sector(screen, mitte, radius, winkel_start, winkel_ende, color):
     winkel_start %= 360
@@ -169,14 +168,16 @@ interval=500
 bomb_active=False
 
 running = True
+sector_end_time = None
 while running:
+    now = time.time()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN:
             if game_state == GAME_START:
                 game_state = GAME_RUNNING
-                start_time = time.time()
+                sector_end_time = now + COUNTDOWN_TIME
             elif event.key == pygame.K_ESCAPE and game_state != GAME_RUNNING:
                 running = False
 
@@ -191,7 +192,7 @@ while running:
     time_left = int(sector_end_time - now)
 
     if time_left <= 0 and game_state == GAME_RUNNING:   
-        aktiver_sektor = (aktiver_sektor + 1) % 6   
+        aktiver_sektor = (aktiver_sektor + 1) % 5
         sector_end_time = now + COUNTDOWN_TIME
         time_left = COUNTDOWN_TIME  
 
@@ -205,8 +206,8 @@ while running:
 
     arena.fill((0, 0, 0, 0)) 
 
-    start = SEKTOR_START_WINKEL - aktiver_sektor * 60
-    ende = start-60
+    start = SEKTOR_START_WINKEL - aktiver_sektor * 72
+    ende = start-72
 
     pygame.draw.circle(arena, (120, 80, 40), CENTER, ARENA_RADIUS + 5)
     draw_sector(arena, CENTER, ARENA_RADIUS+5, start, ende, SECTOR_COLORS[aktiver_sektor])
