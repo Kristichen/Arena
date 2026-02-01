@@ -1,9 +1,8 @@
 import pygame
-
 from constants import *
 import math
 class Laser:
-    def __init__(self,start_sector, speed=0.1):
+    def __init__(self,start_sector, speed=0.5):
         self.angle= start_sector*60 +120
         self.speed=speed
         self.is_on= False
@@ -51,4 +50,4 @@ class Laser:
     def jumped_over(self, player):
         if not self.is_on or self.turned_off:
             return False
-        return not player.on_ground and player.jump_height > 10
+        return not player.on_ground
