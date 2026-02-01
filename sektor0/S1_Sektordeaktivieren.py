@@ -46,7 +46,6 @@ def draw(screen):
     screen.blit(feuerloescher_img, feuerloescher_rect)
 
 def touched(player) -> bool:
-    """Kollision Kreis (Player) gegen Rechteck (Icon)."""
     if not _active:
         return False
     if feuerloescher_rect is None:
@@ -55,7 +54,6 @@ def touched(player) -> bool:
     pr = PLAYER_RADIUS
     px, py = float(player.x), float(player.y)
 
-    # Nächster Punkt im Rect zum Player
     closest_x = max(feuerloescher_rect.left, min(px, feuerloescher_rect.right))
     closest_y = max(feuerloescher_rect.top,  min(py, feuerloescher_rect.bottom))
 

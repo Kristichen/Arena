@@ -62,10 +62,10 @@ def touched(player) -> bool:
     return (dx * dx + dy * dy) <= (pr * pr)
 
 
-def check_and_deactivate(player, rauch_module) -> bool:
+def check_and_deactivate(player, gasmaske_module) -> bool:
     global _active
     if touched(player):
-        rauch_module.stop()
+        gasmaske_module.stop()
         _active = False
         return True
     return False
