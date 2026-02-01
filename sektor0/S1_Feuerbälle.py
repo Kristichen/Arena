@@ -7,7 +7,7 @@ cx, cy = WIDTH//2, HEIGHT//2
 r = ARENA_RADIUS
 
 punkte = []
-for i in range(210, 271):
+for i in range(199, 271):
     w = math.radians(i)
     x = cx + r * math.cos(w)
     y = cy + r * math.sin(w)
@@ -51,16 +51,13 @@ class Feuerball:
 
         max_dist = r - self.radius
 
-        # Abpraller erst, wenn er wirklich draussen wäre
         if dist > max_dist and dist != 0:
             nx = dx / dist
             ny = dy / dist
 
-            # zurück auf den Rand schieben
             self.x = cx + nx * max_dist
             self.y = cy + ny * max_dist
 
-            # Geschwindigkeit spiegeln
             v_dot_n = self.vx * nx + self.vy * ny
             self.vx = self.vx - 2 * v_dot_n * nx
             self.vy = self.vy - 2 * v_dot_n * ny
