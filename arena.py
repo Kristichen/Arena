@@ -6,6 +6,7 @@ from constants import *
 from player import Player
 import sektor0.S1_Sektoraktivität as feuer
 import sektor0.S1_Sektordeaktivieren as feuerloescher
+import sektor2.S2_Sektordeaktivieren as gasmaske
 import sektor2.S2_Sektoraktivität as rauch
 import sektor5.S5_Sektoraktivität as wasser 
 
@@ -17,6 +18,7 @@ font = pygame.font.Font(None, 48)
 rauch.init_images()
 wasser.init_images()
 feuerloescher.init_images()
+gasmaske.init_images()
 
 # Farben
 SECTOR_COLORS = [
@@ -39,7 +41,8 @@ laser_war_aktiv = False
 rauch_war_aktiv = False
 wasser_war_aktiv = False
 
-sektor1_erloest = False 
+sektor0_erloest = False 
+sektor2_erloest = False
 
 def sektort_von_position(pos):
     dx = pos[0] - CENTER[0]
@@ -99,8 +102,11 @@ def update_sector(welcher_sektor):
 # RAUCH
     if rauch_aktiv and not rauch_war_aktiv:
         rauch.start()
+        gasmaske.reset()
+
     if not rauch_aktiv and rauch_war_aktiv:
-        rauch.stop()
+        gasmaske.aktiv_machen(False)
+
     if rauch_aktiv:
         rauch.update_and_draw(screen)
 
@@ -132,6 +138,9 @@ while running:
         if aktiver_sektor == 0:
             feuerloescher.aktiv_machen(False)
 
+        if aktiver_sektor == 2:
+            gasmaske.aktiv_machen(False)
+
         aktiver_sektor = (aktiver_sektor + 1) % 6
         sector_end_time = now + COUNTDOWN_TIME
         time_left = COUNTDOWN_TIME
@@ -148,6 +157,8 @@ while running:
 
     draw_sector(screen, CENTER, ARENA_RADIUS, start, ende, SECTOR_COLORS[aktiver_sektor])
     feuerloescher.draw(screen)
+    gasmaske.draw(screen)
+
     update_sector(aktiver_sektor)
 
     if aktiver_sektor == 0:
@@ -158,6 +169,8 @@ while running:
             feuer.stop()
 
     if aktiver_sektor == 2:
+        gasmaske.check_and_deactivate(player, rauch)
+
         if player.alive and rauch.player_hit(player):
             player.alive = False
             rauch.stop()
