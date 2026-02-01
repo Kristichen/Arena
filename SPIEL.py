@@ -32,6 +32,11 @@ rettungsring.init_images()
 
 laser = Laser(start_sector=1)
 
+arena_floor_img = pygame.image.load("Bilder/arena.png").convert_alpha()
+
+floor_size = ARENA_RADIUS * 2
+arena_floor_img = pygame.transform.scale(arena_floor_img, (floor_size, floor_size))
+
 
 SECTOR_COLORS = [
     (230, 220, 190 ),      
@@ -200,13 +205,12 @@ while running:
 
     arena.fill((0, 0, 0, 0)) 
 
-    pygame.draw.circle(arena, (120, 80, 40), CENTER, ARENA_RADIUS + 5)
-    pygame.draw.circle(arena, (240, 240, 240), CENTER, ARENA_RADIUS)
-
     start = SEKTOR_START_WINKEL - aktiver_sektor * 60
     ende = start-60
 
-
+    pygame.draw.circle(arena, (120, 80, 40), CENTER, ARENA_RADIUS + 5)
+    draw_sector(arena, CENTER, ARENA_RADIUS+5, start, ende, SECTOR_COLORS[aktiver_sektor])
+    arena.blit(arena_floor_img, arena_floor_img.get_rect(center=CENTER))
     feuerloescher.draw(arena)
     gasmaske.draw(arena)
     rettungsring.draw(arena)
@@ -289,26 +293,12 @@ while running:
     text_sector = font.render(f"Aktiver Sektor: {aktiver_sektor + 1}", True, (0, 0, 0))
     screen.blit(text_sector, (WIDTH - 320, 80))
 
-    if game_state != GAME_RUNNING:
-        overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 180))
-        screen.blit(overlay, (0, 0))
-
-        if game_state == GAME_OVER:
-            text_game_over = font.render("Game Over!", True, (255, 0, 0))
-            screen.blit(
-                text_game_over,
-                (WIDTH // 2 - text_game_over.get_width() // 2,
-                 HEIGHT // 2 - text_game_over.get_height() // 2),
-            )
-        elif game_state == GAME_WIN:
-            text_game_win = font.render("You Win!", True, (0, 255, 0))
-            screen.blit(
-                text_game_win,
-                (WIDTH // 2 - text_game_win.get_width() // 2,
-                 HEIGHT // 2 - text_game_win.get_height() // 2),
-            )
-
+    if game_state == GAME_OVER:
+        screen.fill((0, 0, 0))
+        screen.blit(font.render("Game Over", True, (255, 0, 0)),(WIDTH//2 - 100, HEIGHT//2 - 24))   
+    elif game_state == GAME_WIN:
+        screen.fill((0, 0, 0))
+        screen.blit(font.render("You Win!", True, (0, 255, 0)),(WIDTH//2 - 80, HEIGHT//2 - 24)) 
     pygame.display.flip()
     clock.tick(60)
 

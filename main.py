@@ -40,7 +40,6 @@ except:
 
 # Farben
 SECTOR_COLORS = [
-    (230, 220, 190 ),      # türkis hell [0]
     ( 40,130 ,120 ),    # türkis dunkel [1]
     (80 ,110 ,170 ),      # marine hell [2]
     (20 ,40 ,90 ),    # marine dunkel [3]
@@ -81,7 +80,7 @@ def sektort_von_position(pos):
         return None
     
     winkel = (math.degrees(math.atan2(dy,dx)) + 360) % 360
-    return int(winkel // 60)
+    return int(winkel // 72)
 
 def draw_sector(screen, mitte, radius, winkel_start, winkel_ende, color):
     winkel_start %= 360
@@ -180,7 +179,7 @@ while running:
     time_left = int(sector_end_time - now)
 
     if time_left <= 0 and game_state == GAME_RUNNING:   
-        aktiver_sektor = (aktiver_sektor + 1) % 6   
+        aktiver_sektor = (aktiver_sektor + 1) % 5 
         sector_end_time = now + COUNTDOWN_TIME
         time_left = COUNTDOWN_TIME  
 
@@ -194,7 +193,7 @@ while running:
     player.update(pressed)
 
     start = SEKTOR_START_WINKEL - aktiver_sektor * 60
-    ende = start-60
+    ende = start-72
     screen.fill((240, 230, 200))
     pygame.draw.circle(arena, (120, 80, 40), CENTER, ARENA_RADIUS + 5)
     draw_sector(arena, CENTER, ARENA_RADIUS+5, start, ende, SECTOR_COLORS[aktiver_sektor])

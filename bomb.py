@@ -4,20 +4,14 @@ import math
 from constants import *
 import os
 
-bomb_img = None
-
-def init_images():
-    global bomb_img
-    base = os.path.dirname(__file__)
-    bomb_img = pygame.image.load(os.path.join(base,"bomb.png")).convert_alpha()
-    expl_img = pygame.image.load(os.path.join(base,"expl.png")).convert_alpha()
 
 class Bomb:
     def __init__(self):
-        self.image= pygame.image.load("bomb.png")
-        self.image= pygame.transform.scale(self.image, (60,60))
-        self.expl_img= pygame.image.load("expl.png")
-        self.expl_img= pygame.transform.scale(self.expl_img, (160,160))
+        self.image = pygame.image.load("Bilder/bomb.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (60, 60))
+        
+        self.expl_img = pygame.image.load("bilder/expl.png").convert_alpha()
+        self.expl_img = pygame.transform.scale(self.expl_img, (160, 160))
 
         self.pos=self.random_position()
         self.rect=self.image.get_rect(center=self.pos)
