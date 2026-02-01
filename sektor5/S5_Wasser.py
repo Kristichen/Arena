@@ -4,7 +4,6 @@ import math
 from constants import CENTER, ARENA_RADIUS
 import os
 
-
 wasser_img = None
 
 def init_images():

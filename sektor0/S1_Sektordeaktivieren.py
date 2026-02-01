@@ -3,7 +3,6 @@ from constants import *
 import os
 import math
 
-
 ERLOESEN_POS = (WIDTH // 3, HEIGHT // 3)
 
 feuerloescher_img = None
@@ -60,7 +59,6 @@ def touched(player) -> bool:
     dx = px - closest_x
     dy = py - closest_y
     return (dx * dx + dy * dy) <= (pr * pr)
-
 
 def check_and_deactivate(player, feuer_module) -> bool:
     global _active

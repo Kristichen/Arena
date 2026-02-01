@@ -29,7 +29,7 @@ def bleibt_in_arena(x, y, size):
 class RauchWolke:
     def __init__(self, x, y):
         x, y = bleibt_in_arena(x, y, 30)
-        self.layers = [(x, y, 30)]  # Startwolke (x, y, size)
+        self.layers = [(x, y, 30)]  
         self.start_tick = pygame.time.get_ticks()
         self.spawn_index = 0
 

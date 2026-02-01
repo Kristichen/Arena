@@ -4,7 +4,7 @@ import random
 from constants import PLAYER_RADIUS
 from player import*
 
-_feuerbaelle = [] # _ -> damit interne Liste
+_feuerbaelle = [] 
 _is_spaming = False
 
 def start(anzahl = 20):
