@@ -1,29 +1,71 @@
 import pygame
-import math
 from constants import *
+import os
+import math
 
-ERLOESEN_POS = (WIDTH // 2, HEIGHT // 2)
-ERLOESEN_RADIUS = 22
 
-ERLOESEN_COLOR = (255, 165, 0)
-ERLOESEN_BORDER = (200, 120, 0)    
+ERLOESEN_POS = (WIDTH // 3 *2, HEIGHT // 3*2)
+
+gasmaske_img = None
+gasmaske_rect = None
+
+ICON_SIZE = (60, 60)
+
+_active = False
+
+def init_images():
+    global gasmaske_img, gasmaske_rect
+
+    base = os.path.dirname(__file__)
+    path = os.path.join(base, "gasmaske.png")
+
+    img = pygame.image.load(path).convert_alpha()
+
+    if ICON_SIZE is not None:
+        img = pygame.transform.smoothscale(img, ICON_SIZE)
+
+    gasmaske_img = img
+    gasmaske_rect = gasmaske_img.get_rect(center=ERLOESEN_POS)
+
+def reset():
+    global _active
+    _active = True
+
+def aktiv_machen(value: bool):
+    global _active
+    _active = value
+
+def ist_active() -> bool:
+    return _active
 
 def draw(screen):
-    pygame.draw.circle(screen, ERLOESEN_COLOR, ERLOESEN_POS, ERLOESEN_RADIUS)
-    pygame.draw.circle(screen, ERLOESEN_BORDER, ERLOESEN_POS, ERLOESEN_RADIUS, 3)
+    if not _active:
+        return
+    if gasmaske_img is None or gasmaske_rect is None:
+        return
+    screen.blit(gasmaske_img, gasmaske_rect)
 
 def touched(player) -> bool:
-    pr = PLAYER_RADIUS  
+    if not _active:
+        return False
+    if gasmaske_rect is None:
+        return False
 
-    dx = float(player.x) - ERLOESEN_POS[0]
-    dy = float(player.y) - ERLOESEN_POS[1]
-    dist = math.hypot(dx, dy)
+    pr = PLAYER_RADIUS
+    px, py = float(player.x), float(player.y)
 
-    return dist <= (ERLOESEN_RADIUS + pr)
+    closest_x = max(gasmaske_rect.left, min(px, gasmaske_rect.right))
+    closest_y = max(gasmaske_rect.top,  min(py, gasmaske_rect.bottom))
+
+    dx = px - closest_x
+    dy = py - closest_y
+    return (dx * dx + dy * dy) <= (pr * pr)
 
 
-def check_and_deactivate(player, feuer_module) -> bool:
+def check_and_deactivate(player, gasmaske_module) -> bool:
+    global _active
     if touched(player):
-        feuer_module.stop()
+        gasmaske_module.stop()
+        _active = False
         return True
     return False
