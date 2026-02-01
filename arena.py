@@ -5,15 +5,9 @@ import time
 from constants import *
 from player import Player
 import sektor0.S1_Sektoraktivität as feuer
-import sektor0.S1_Sektordeaktivieren as feuerlöscher
+import sektor0.S1_Sektordeaktivieren as feuerloescher
 import sektor2.S2_Sektoraktivität as rauch
 import sektor5.S5_Sektoraktivität as wasser 
-
-#print("Rauch-Modul:", rauch.__file__)
-#print("Hat init_images?", hasattr(rauch, "init_images"))
-
-#print("Wasser-Modul:", wasser.__file__)
-#print("Hat init_images?", hasattr(wasser, "init_images"))
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -22,7 +16,7 @@ clock = pygame.time.Clock()
 font = pygame.font.Font(None, 48)
 rauch.init_images()
 wasser.init_images()
-feuerlöscher.init_images()
+feuerloescher.init_images()
 
 # Farben
 SECTOR_COLORS = [
@@ -46,10 +40,6 @@ rauch_war_aktiv = False
 wasser_war_aktiv = False
 
 sektor1_erloest = False 
-
-#if aktiver_sektor == 0:
-#    if erloesen.check_and_deactivate(player, sektor1):
-#        sektor1_erloest = True
 
 def sektort_von_position(pos):
     dx = pos[0] - CENTER[0]
@@ -99,8 +89,11 @@ def update_sector(welcher_sektor):
 # FEUER
     if feuer_aktiv and not feuer_war_aktiv:
         feuer.start(anzahl=20)
+        feuerloescher.reset()
+
     if not feuer_aktiv and feuer_war_aktiv:
-        feuer.stop()
+        feuerloescher.aktiv_machen(False)
+        
     if feuer_aktiv:
         feuer.update_and_draw(screen)
 # RAUCH
@@ -137,7 +130,7 @@ while running:
 
     if time_left <= 0:        
         if aktiver_sektor == 0:
-            sektor1_erloest = False 
+            feuerloescher.aktiv_machen(False)
 
         aktiver_sektor = (aktiver_sektor + 1) % 6
         sector_end_time = now + COUNTDOWN_TIME
@@ -154,11 +147,11 @@ while running:
     ende = start-60
 
     draw_sector(screen, CENTER, ARENA_RADIUS, start, ende, SECTOR_COLORS[aktiver_sektor])
-    feuerlöscher.draw(screen)
+    feuerloescher.draw(screen)
     update_sector(aktiver_sektor)
 
     if aktiver_sektor == 0:
-        feuerlöscher.check_and_deactivate(player, feuer)
+        feuerloescher.check_and_deactivate(player, feuer)
 
         if player.alive and feuer.player_hit(player):
             player.alive = False
