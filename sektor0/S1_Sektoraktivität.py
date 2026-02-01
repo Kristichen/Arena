@@ -5,11 +5,11 @@ from constants import PLAYER_RADIUS
 from player import*
 
 _feuerbaelle = [] # _ -> damit interne Liste
-_is_running = False
+_is_spaming = False
 
 def start(anzahl = 20):
-    global _feuerbaelle, _is_running
-    _is_running = True
+    global _feuerbaelle, _is_spaming
+    _is_spaming = True
     _feuerbaelle = []
 
     for _ in range(anzahl):
@@ -18,13 +18,11 @@ def start(anzahl = 20):
         _feuerbaelle.append(Feuerball(punkte,vx, vy))
 
 def stop():
-    global _feuerbaelle, _is_running
-    _is_running = False
+    global _feuerbaelle, _is_spaming
+    _is_spaming = False
     _feuerbaelle = []
 
 def player_hit(player) -> bool:
-        if not _is_running:
-            return False
 
         px, py = float(player.x), float(player.y)
         pr = PLAYER_RADIUS
@@ -41,9 +39,8 @@ def player_hit(player) -> bool:
         return False
 
 def update_and_draw(screen):
-    if not _is_running:
+    if not _feuerbaelle:
         return
-    
     for b in _feuerbaelle:
         b.update()
         b.draw(screen)
