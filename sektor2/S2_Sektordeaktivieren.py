@@ -4,7 +4,7 @@ import os
 import math
 
 
-ERLOESEN_POS = (WIDTH // 3 *2, HEIGHT // 3*2)
+ERLOESEN_POS = (WIDTH // 3, HEIGHT // 3*2)
 
 gasmaske_img = None
 gasmaske_rect = None

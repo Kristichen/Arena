@@ -63,7 +63,7 @@ class texte:
         self._zeichne_box(
             screen,
             self.box_links,
-            "Aktive Gefahr",
+            "active danger",
             gefahrenname,
             self.orange_breite_links
         )
@@ -71,7 +71,7 @@ class texte:
         self._zeichne_box(
             screen,
             self.box_rechts,
-            "Countdown",
+            "countdown",
             f"{int(restzeit)}s",
             self.orange_breite_rechts
         )
